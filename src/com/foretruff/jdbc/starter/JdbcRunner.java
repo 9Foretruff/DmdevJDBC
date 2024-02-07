@@ -22,6 +22,38 @@ public class JdbcRunner {
         var flightBetween = getFlightBetween(localDateTime1, localDateTime2);
         System.out.println(flightBetween);
 
+        System.out.println("-------");
+
+        checkMetaData();
+
+    }
+
+    private static void checkMetaData() throws SQLException {
+        try (var connection = ConnectionManager.open()) {
+            var metaData = connection.getMetaData();
+            var catalogs = metaData.getCatalogs();
+            while (catalogs.next()) {
+                var catalog = catalogs.getString("TABLE_CAT");
+
+                var schemas = metaData.getSchemas();
+                while (schemas.next()) {
+                    var schema = schemas.getString("TABLE_SCHEM");
+
+                    var tables = metaData.getTables(catalog, schema, "%", new String[]{"TABLE"});
+                    if (schema.equals("public")) {
+                        while (tables.next()) {
+                            System.out.println(tables.getString("TABLE_NAME"));
+                            var columns = metaData.getColumns(catalog, schema, "%", null);
+
+                            while (columns.next()) {
+                                System.out.println(columns.getString("COLUMN_NAME"));
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private static List<Long> getFlightBetween(LocalDateTime start, LocalDateTime end) throws SQLException {
