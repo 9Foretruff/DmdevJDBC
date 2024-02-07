@@ -20,7 +20,7 @@ public class TransactionRunner {
 
         try {
 
-            connection = ConnectionManager.open();
+            connection = ConnectionManager.get();
             connection.setAutoCommit(false);
 //            deleteFlightStatement = connection.prepareStatement(deleteFlightSql);
 //            deleteTicketStatement = connection.prepareStatement(deleteTicketSql);
