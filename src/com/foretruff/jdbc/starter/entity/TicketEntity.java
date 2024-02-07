@@ -3,14 +3,14 @@ package com.foretruff.jdbc.starter.entity;
 import java.math.BigDecimal;
 
 public class TicketEntity {
-    private Integer id;
+    private Long id;
     private String passengerNo;
     private String passengerName;
     private Long flightId;
     private String seatNo;
     private BigDecimal cost;
 
-    public TicketEntity(Integer id, String passengerNo, String passengerName, Long flightId, String seatNo, BigDecimal cost) {
+    public TicketEntity(Long id, String passengerNo, String passengerName, Long flightId, String seatNo, BigDecimal cost) {
         this.id = id;
         this.passengerNo = passengerNo;
         this.passengerName = passengerName;
@@ -22,11 +22,11 @@ public class TicketEntity {
     public TicketEntity() {
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
