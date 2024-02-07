@@ -9,7 +9,6 @@ public class JdbcRunner {
         try (var connection = ConnectionManager.open()) {
             System.out.println(connection.getTransactionIsolation());
         }
-
     }
 
 }
