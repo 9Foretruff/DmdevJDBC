@@ -33,6 +33,10 @@ public class JdbcRunner {
         List<Long> result = new ArrayList<>();
         try (var connection = ConnectionManager.open();
              var preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setFetchSize(50);
+            preparedStatement.setQueryTimeout(10);
+            preparedStatement.setMaxRows(100);
+
             preparedStatement.setTimestamp(1, Timestamp.valueOf(start));
             preparedStatement.setTimestamp(2, Timestamp.valueOf(end));
 
