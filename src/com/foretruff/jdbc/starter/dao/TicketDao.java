@@ -1,6 +1,7 @@
 package com.foretruff.jdbc.starter.dao;
 
 import com.foretruff.jdbc.starter.dto.TicketFilter;
+import com.foretruff.jdbc.starter.entity.FlightEntity;
 import com.foretruff.jdbc.starter.entity.TicketEntity;
 import com.foretruff.jdbc.starter.exception.DaoException;
 import com.foretruff.jdbc.starter.util.ConnectionManager;
@@ -8,14 +9,13 @@ import com.foretruff.jdbc.starter.util.ConnectionManager;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.joining;
 
-public class TicketDao {
+public class TicketDao implements Dao<Long, TicketEntity> {
     private static final TicketDao INSTANCE = new TicketDao();
+    private final FlightDao flightDao = FlightDao.getInstance();
     private static final String DELETE_SQL = """
             DELETE
             FROM ticket
@@ -145,7 +145,7 @@ public class TicketDao {
              var preparedStatement = connection.prepareStatement(UPDATE_SQL)) {
             preparedStatement.setString(1, ticket.getPassengerNo());
             preparedStatement.setString(2, ticket.getPassengerName());
-            preparedStatement.setLong(3, ticket.getFlightId());
+            preparedStatement.setLong(3, ticket.getFlight().getId());
             preparedStatement.setString(4, ticket.getSeatNo());
             preparedStatement.setBigDecimal(5, ticket.getCost());
             preparedStatement.setLong(6, ticket.getId());
@@ -172,7 +172,7 @@ public class TicketDao {
              var preparedStatement = connection.prepareStatement(SAVE_SQL, Statement.RETURN_GENERATED_KEYS)) {
             preparedStatement.setString(1, ticket.getPassengerNo());
             preparedStatement.setString(2, ticket.getPassengerName());
-            preparedStatement.setLong(3, ticket.getFlightId());
+            preparedStatement.setLong(3, ticket.getFlight().getId());
             preparedStatement.setString(4, ticket.getSeatNo());
             preparedStatement.setBigDecimal(5, ticket.getCost());
 
@@ -195,7 +195,7 @@ public class TicketDao {
                 resultSet.getLong("id"),
                 resultSet.getString("passenger_no"),
                 resultSet.getString("passenger_name"),
-                resultSet.getLong("flight_id"),
+                flightDao.findById(resultSet.getLong("flight_id"), resultSet.getStatement().getConnection()).orElse(null),
                 resultSet.getString("seat_no"),
                 resultSet.getBigDecimal("cost")
         );

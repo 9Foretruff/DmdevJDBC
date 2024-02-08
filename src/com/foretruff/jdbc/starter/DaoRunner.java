@@ -5,8 +5,6 @@ import com.foretruff.jdbc.starter.dto.TicketFilter;
 import com.foretruff.jdbc.starter.entity.TicketEntity;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
 
 // Alt + M
 // CTRL + SHIFT + N
@@ -21,6 +19,12 @@ public class DaoRunner {
     */
 
     public static void main(String[] args) {
+        var ticketDao = TicketDao.getInstance();
+        var maybeTicket = ticketDao.findById(5L);
+        System.out.println(maybeTicket.orElse(null));
+    }
+
+    private static void filterTest() {
         var ticketFilter = new TicketFilter(10, 0, "VOVA", null);
         var ticketDao = TicketDao.getInstance();
         ticketDao.findAll(ticketFilter).forEach(System.out::println);
@@ -54,7 +58,7 @@ public class DaoRunner {
         var ticketEntity = new TicketEntity();
         ticketEntity.setPassengerNo("ABC");
         ticketEntity.setPassengerName("Maksim Rokitko");
-        ticketEntity.setFlightId(1L);
+//        ticketEntity.setFlight(1L);
         ticketEntity.setSeatNo("B3");
         ticketEntity.setCost(BigDecimal.TEN);
         var savedTicket = ticketDao.save(ticketEntity);
