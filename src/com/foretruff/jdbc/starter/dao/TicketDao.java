@@ -1,5 +1,6 @@
 package com.foretruff.jdbc.starter.dao;
 
+import com.foretruff.jdbc.starter.dto.TicketFilter;
 import com.foretruff.jdbc.starter.entity.TicketEntity;
 import com.foretruff.jdbc.starter.exception.DaoException;
 import com.foretruff.jdbc.starter.util.ConnectionManager;
@@ -7,7 +8,11 @@ import com.foretruff.jdbc.starter.util.ConnectionManager;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.joining;
 
 public class TicketDao {
     private static final TicketDao INSTANCE = new TicketDao();
@@ -57,6 +62,48 @@ public class TicketDao {
 
     public static TicketDao getInstance() {
         return INSTANCE;
+    }
+
+    public List<TicketEntity> findAll(TicketFilter filter) {
+        List<Object> parameters = new ArrayList<>();
+        List<String> whereSql = new ArrayList<>();
+        if (filter.seatNo() != null) {
+            whereSql.add("seat_no LIKE ?");
+            parameters.add(filter.seatNo() + "%");
+        }
+        if (filter.passengerName() != null) {
+            whereSql.add("passenger_name = ?");
+            parameters.add(filter.passengerName());
+        }
+        parameters.add(filter.limit());
+        parameters.add(filter.offset());
+
+        String where = "LIMIT ? OFFSET ?";
+        if (!whereSql.isEmpty()) {
+            where = whereSql.stream().collect(joining("AND", "WHERE ", " LIMIT ? OFFSET ?"));
+        }
+
+        var sql = FIND_ALL_SQL + where;
+
+        try (var connection = ConnectionManager.get();
+             var preparedStatement = connection.prepareStatement(sql)) {
+
+            for (int i = 0; i < parameters.size(); i++) {
+                preparedStatement.setObject(i + 1, parameters.get(i));
+            }
+
+            var resultSet = preparedStatement.executeQuery();
+            List<TicketEntity> result = new ArrayList<>();
+
+            while (resultSet.next()) {
+                result.add(buildTicket(resultSet));
+            }
+
+            return result;
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public List<TicketEntity> findAll() {

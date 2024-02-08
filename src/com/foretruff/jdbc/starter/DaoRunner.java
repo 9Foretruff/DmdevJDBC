@@ -1,6 +1,7 @@
 package com.foretruff.jdbc.starter;
 
 import com.foretruff.jdbc.starter.dao.TicketDao;
+import com.foretruff.jdbc.starter.dto.TicketFilter;
 import com.foretruff.jdbc.starter.entity.TicketEntity;
 
 import java.math.BigDecimal;
@@ -10,13 +11,27 @@ import java.util.Optional;
 // Alt + M
 // CTRL + SHIFT + N
 public class DaoRunner {
-    public static void main(String[] args) {
-        var ticketDao = TicketDao.getInstance();
-        ticketDao.findAll().forEach(System.out::println);
 
+    /*
+    EXPLAIN ANALYSE
+    SELECT *
+    FROM test2
+    WHERE id > 80000 //id
+    LIMIT 20
+    */
+
+    public static void main(String[] args) {
+        var ticketFilter = new TicketFilter(10, 0, "VOVA", null);
+        var ticketDao = TicketDao.getInstance();
+        ticketDao.findAll(ticketFilter).forEach(System.out::println);
     }
 
-    public static void findByIdAndUpdate(){
+    private static void findAll() {
+        var ticketDao = TicketDao.getInstance();
+        ticketDao.findAll().forEach(System.out::println);
+    }
+
+    public static void findByIdAndUpdate() {
         var ticketDao = TicketDao.getInstance();
         var maybeTicket = ticketDao.findById(5L);
         System.out.println(maybeTicket);
